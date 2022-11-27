@@ -28,7 +28,7 @@ podTemplate(yaml: '''
           }
         }
         echo "Test: "+ gitInfo
-        githubNotify context:env.HUDSON_URL, description:'Validating SMO package', repo:'oran-deployment', status:'PENDING', sha:gitInfo.GIT_COMMIT, credentialsId:'github_username_pass'
+        githubNotify context:env.HUDSON_URL, description:'Validating SMO package', status:'PENDING', credentialsId:'github_username_pass'
 
       }
       container('jenkins-ubuntu') {
