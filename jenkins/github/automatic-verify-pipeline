@@ -12,21 +12,9 @@ podTemplate(yaml: '''
                   - 99d
 ''') {
   node(POD_LABEL) {
-      def getCredentialUsername = { ->
-        def credentialId = 'github_username_pass'
-        def credentials = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
-             com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials.class, 
-            Jenkins.instance
-        );
-        def cred = credentials.findResult { it.id == credentialId ? it : null }
-        def username = cred.username;
-        username
-      }
-
       def proxies=''
       sh 'printenv'
       def repoUrl=scm.getUserRemoteConfigs()[0].getUrl()
-      def notifyUsername = getCredentialUsername()
 
       stage('Checkout') {
         script {
@@ -40,7 +28,7 @@ podTemplate(yaml: '''
           }
         }
         echo "Test: "+ gitInfo
-        githubNotify context:env.HUDSON_URL, description:'Validating SMO package', repo:'oran-deployment', account: getCredentialUsername, status:'PENDING', sha:gitInfo.GIT_COMMIT, credentialsId:'github_username_pass'
+        githubNotify context:env.HUDSON_URL, description:'Validating SMO package', repo:'oran-deployment', status:'PENDING', sha:gitInfo.GIT_COMMIT, credentialsId:'github_username_pass'
 
       }
       container('jenkins-ubuntu') {
@@ -101,12 +89,12 @@ podTemplate(yaml: '''
                 } else {
                   sh 'tox'
                 }
-                githubNotify context:env.HUDSON_URL, description:'SMO Package build SUCCESSFUL', repo:'oran-deployment', account: getCredentialUsername, status:'SUCCESS', sha:gitInfo.GIT_COMMIT, credentialsId:'github_username_pass'
+                githubNotify context:env.HUDSON_URL, description:'SMO Package build SUCCESSFUL', repo:'oran-deployment', status:'SUCCESS', sha:gitInfo.GIT_COMMIT, credentialsId:'github_username_pass'
                 currentBuild.result = 'SUCCESS'
               }
               catch(exec) {
                 echo 'TOX tests crashed'
-                githubNotify context:env.HUDSON_URL, description:'SMO Package build FAILED, TOX tests crashed', repo:'oran-deployment', account: getCredentialUsername, status:'FAILURE', sha:gitInfo.GIT_COMMIT, credentialsId:'github_username_pass'
+                githubNotify context:env.HUDSON_URL, description:'SMO Package build FAILED, TOX tests crashed', repo:'oran-deployment', status:'FAILURE', sha:gitInfo.GIT_COMMIT, credentialsId:'github_username_pass'
                 currentBuild.result = 'FAILURE'
               }
             }
