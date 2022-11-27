@@ -26,7 +26,7 @@ podTemplate(yaml: '''
       def proxies=''
       sh 'printenv'
       def repoUrl=scm.getUserRemoteConfigs()[0].getUrl()
-      def notifyUsername = getCredentialUsername
+      def notifyUsername = getCredentialUsername()
 
       stage('Checkout') {
         script {
