@@ -28,10 +28,10 @@ podTemplate(yaml: '''
           }
         }
         echo "Test: "+ gitInfo
-        githubNotify context:env.HUDSON_URL, description:'Validating SMO package', status:'PENDING', credentialsId:'github_username_pass'
 
       }
       container('jenkins-ubuntu') {
+        githubNotify context:env.HUDSON_URL, description:'Validating SMO package', status:'PENDING', credentialsId:'github_username_pass'
         stage ('Proxy settings') {
           echo 'Proxy check'
           script {
