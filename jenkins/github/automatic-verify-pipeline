@@ -15,7 +15,7 @@ podTemplate(yaml: '''
       def proxies=''
       sh 'printenv'
       def repoUrl=scm.getUserRemoteConfigs()[0].getUrl()
-      githubNotify account: context:env.HUDSON_URL, description:'Start pipeline', status:'PENDING', credentialsId:'github_username_pass'
+      githubNotify context:env.HUDSON_URL, description:'Start pipeline', status:'PENDING', credentialsId:'github_username_pass'
       stage('Checkout') {
         script {
           if (env.BRANCH_NAME.startsWith('PR-')) {
