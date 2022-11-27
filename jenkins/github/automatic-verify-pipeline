@@ -1,3 +1,14 @@
+def getCredentialUsername() {
+  def credentialId = 'github_username_pass'
+  def credentials = CredentialsProvider.lookupCredentials(
+      StandardUsernamePasswordCredentials.class, 
+      Jenkins.instance
+  );
+  def cred = credentials.findResult { it.id == credentialId ? it : null }
+  def username = cred.username;
+  return username
+}
+
 lock('smo') {
 podTemplate(yaml: '''
               apiVersion: v1
@@ -114,16 +125,4 @@ podTemplate(yaml: '''
    
   }
 }
-}
-
-
-def getCredentialUsername() {
-  def credentialId = 'github_username_pass'
-  def credentials = CredentialsProvider.lookupCredentials(
-      StandardUsernamePasswordCredentials.class, 
-      Jenkins.instance
-  );
-  def cred = credentials.findResult { it.id == credentialId ? it : null }
-  def username = cred.username;
-  return username
 }
