@@ -12,7 +12,7 @@ podTemplate(yaml: '''
                   - 99d
 ''') {
   node(POD_LABEL) {
-      String getCredentialUsername() {
+      def getCredentialUsername = { ->
         def credentialId = 'github_username_pass'
         def credentials = CredentialsProvider.lookupCredentials(
             StandardUsernamePasswordCredentials.class, 
@@ -20,9 +20,9 @@ podTemplate(yaml: '''
         );
         def cred = credentials.findResult { it.id == credentialId ? it : null }
         def username = cred.username;
-        return username
+        username
       }
-      
+
       def proxies=''
       sh 'printenv'
       def repoUrl=scm.getUserRemoteConfigs()[0].getUrl()
