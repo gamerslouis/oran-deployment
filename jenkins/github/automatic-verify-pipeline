@@ -1,14 +1,3 @@
-def getCredentialUsername() {
-  def credentialId = 'github_username_pass'
-  def credentials = CredentialsProvider.lookupCredentials(
-      StandardUsernamePasswordCredentials.class, 
-      Jenkins.instance
-  );
-  def cred = credentials.findResult { it.id == credentialId ? it : null }
-  def username = cred.username;
-  return username
-}
-
 lock('smo') {
 podTemplate(yaml: '''
               apiVersion: v1
@@ -23,7 +12,17 @@ podTemplate(yaml: '''
                   - 99d
 ''') {
   node(POD_LABEL) {
-      
+      def getCredentialUsername() {
+        def credentialId = 'github_username_pass'
+        def credentials = CredentialsProvider.lookupCredentials(
+            StandardUsernamePasswordCredentials.class, 
+            Jenkins.instance
+        );
+        def cred = credentials.findResult { it.id == credentialId ? it : null }
+        def username = cred.username;
+        return username
+      }
+
       def proxies=''
       sh 'printenv'
       def repoUrl=scm.getUserRemoteConfigs()[0].getUrl()
