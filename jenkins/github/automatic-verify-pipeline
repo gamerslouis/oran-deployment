@@ -15,16 +15,18 @@ podTemplate(yaml: '''
       
       def proxies=''
       sh 'printenv'
-      echo scm.getUserRemoteConfigs()[0].getUrl()
+      echo scm.getUserRemoteConfigs()[0].	getName()
+
+      def repoUrl=scm.getUserRemoteConfigs()[0].getUrl()
       stage('Checkout') {
         script {
           if (env.BRANCH_NAME.startsWith('PR-')) {
             echo 'PULL REQUEST case detected'
-            gitInfo =  checkout([$class: 'GitSCM', branches: [[name: 'pr/'+env.CHANGE_ID]], extensions: [[$class: 'SubmoduleOption', recursiveSubmodules: true]], userRemoteConfigs: [[credentialsId: 'github_username_pass', name: 'origin', refspec: '+refs/pull/*/head:refs/remotes/origin/pr/*', url: 'https://github.com/sebdet/oran-deployment.git']]])
+            gitInfo =  checkout([$class: 'GitSCM', branches: [[name: 'pr/'+env.CHANGE_ID]], extensions: [[$class: 'SubmoduleOption', recursiveSubmodules: true]], userRemoteConfigs: [[credentialsId: 'github_username_pass', name: 'origin', refspec: '+refs/pull/*/head:refs/remotes/origin/pr/*', url: repoUrl]]])
 
           } else {
             echo 'BRANCH case detected'
-            gitInfo =  checkout([$class: 'GitSCM', branches: [[name: env.BRANCH_NAME]], extensions: [[$class: 'SubmoduleOption', recursiveSubmodules: true]], userRemoteConfigs: [[credentialsId: 'github_username_pass', name: 'origin', refspec: '+refs/heads/*:refs/remotes/origin/*', url: 'https://github.com/sebdet/oran-deployment.git']]])
+            gitInfo =  checkout([$class: 'GitSCM', branches: [[name: env.BRANCH_NAME]], extensions: [[$class: 'SubmoduleOption', recursiveSubmodules: true]], userRemoteConfigs: [[credentialsId: 'github_username_pass', name: 'origin', refspec: '+refs/heads/*:refs/remotes/origin/*', url: repoUrl]]])
           }
         }
         echo "Test: "+ gitInfo
