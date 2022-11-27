@@ -15,9 +15,9 @@ podTemplate(yaml: '''
       
       def proxies=''
       sh 'printenv'
-      echo scm.getUserRemoteConfigs()[0].	getName()
-
       def repoUrl=scm.getUserRemoteConfigs()[0].getUrl()
+      def notifyUsername = getCredentialUsername
+
       stage('Checkout') {
         script {
           if (env.BRANCH_NAME.startsWith('PR-')) {
@@ -30,7 +30,7 @@ podTemplate(yaml: '''
           }
         }
         echo "Test: "+ gitInfo
-        githubNotify context:env.HUDSON_URL, description:'Validating SMO package', repo:'oran-deployment', account: 'sebdet', status:'PENDING', sha:gitInfo.GIT_COMMIT, credentialsId:'github_username_pass'
+        githubNotify context:env.HUDSON_URL, description:'Validating SMO package', repo:'oran-deployment', account: getCredentialUsername, status:'PENDING', sha:gitInfo.GIT_COMMIT, credentialsId:'github_username_pass'
 
       }
       container('jenkins-ubuntu') {
@@ -91,12 +91,12 @@ podTemplate(yaml: '''
                 } else {
                   sh 'tox'
                 }
-                githubNotify context:env.HUDSON_URL, description:'SMO Package build SUCCESSFUL', repo:'oran-deployment', account: 'sebdet', status:'SUCCESS', sha:gitInfo.GIT_COMMIT, credentialsId:'github_username_pass'
+                githubNotify context:env.HUDSON_URL, description:'SMO Package build SUCCESSFUL', repo:'oran-deployment', account: getCredentialUsername, status:'SUCCESS', sha:gitInfo.GIT_COMMIT, credentialsId:'github_username_pass'
                 currentBuild.result = 'SUCCESS'
               }
               catch(exec) {
                 echo 'TOX tests crashed'
-                githubNotify context:env.HUDSON_URL, description:'SMO Package build FAILED, TOX tests crashed', repo:'oran-deployment', account: 'sebdet', status:'FAILURE', sha:gitInfo.GIT_COMMIT, credentialsId:'github_username_pass'
+                githubNotify context:env.HUDSON_URL, description:'SMO Package build FAILED, TOX tests crashed', repo:'oran-deployment', account: getCredentialUsername, status:'FAILURE', sha:gitInfo.GIT_COMMIT, credentialsId:'github_username_pass'
                 currentBuild.result = 'FAILURE'
               }
             }
@@ -117,3 +117,13 @@ podTemplate(yaml: '''
 }
 
 
+def getCredentialUsername() {
+  def credentialId = 'github_username_pass'
+  def credentials = CredentialsProvider.lookupCredentials(
+      StandardUsernamePasswordCredentials.class, 
+      Jenkins.instance
+  );
+  def cred = credentials.findResult { it.id == credentialId ? it : null }
+  def username = cred.username;
+  return username
+}
