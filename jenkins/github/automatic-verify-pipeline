@@ -14,8 +14,8 @@ podTemplate(yaml: '''
   node(POD_LABEL) {
       def getCredentialUsername = { ->
         def credentialId = 'github_username_pass'
-        def credentials = CredentialsProvider.lookupCredentials(
-            StandardUsernamePasswordCredentials.class, 
+        def credentials = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
+             com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials.class, 
             Jenkins.instance
         );
         def cred = credentials.findResult { it.id == credentialId ? it : null }
